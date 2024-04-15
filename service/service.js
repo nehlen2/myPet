@@ -1,4 +1,4 @@
-const { findUserByEmail, createUser, createSlot } = require("../repository/repo");
+const { findUserByEmail, createUser, createSlot, bookSlot, acceptBookig, findAllUsers, findSlotsBySitter } = require("../repository/repo");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
@@ -40,5 +40,37 @@ exports.generateAccessJWT = function (user) {
     } catch (error) {
       console.error("service could not create slot")
     }
+  }
+  exports.bookSlot = async function (user, slotId) {
+    try {
+      return await bookSlot(user, slotId);
+    } catch (error) {
+      console.error("Service could not book slot")
+    }
+  }
 
+  exports.acceptBooking = async function (slotId) {
+    try {
+      return await acceptBookig(slotId);
+    } catch (error) {
+      console.error("Service could not book slot")
+    }
+  }
+
+  exports.getAllUsers = async () => {
+    try {
+      let users = await findAllUsers();
+      return users;
+    } catch(error) {
+      console.error("Service could not get users")
+    }
+  }
+
+  exports.getSlotsBySitter = async (sitterId) => {
+    try {
+      let bookings = await findSlotsBySitter(sitterId);
+      return bookings;
+    } catch(error) {
+      console.error("Service could not get users")
+    }
   }

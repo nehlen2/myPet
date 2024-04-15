@@ -8,7 +8,7 @@ const cookieSession = require("cookie-session");
 const service = require("./service/service.js");
 const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate.js");
-const repo = require("./repository/repo.js");
+
 
 // configure mustache as template engine
 app.engine("html", mustacheExpress());
@@ -126,22 +126,70 @@ app.post("/register", async (req, res) => {
       message: "Welcome to our API homepage!",
     });
   } else {
-    res.status(400).json({
+    res.status(500).json({
       status: "failed",
       message: "could not register",
     });
   }
 });
 
-app.post("/book_slot" , validate.Verify, async (req, res) => {
+app.get
+
+app.post("/create_slot" , validate.Verify, async (req, res) => {
   try {
-    let booked_slot = await service.createSlot(req.body.sitter, req.body.beginDateTime, req.body.endDateTime);
+    console.log(req.body, req.body.beginDateTime, req.body.endDateTime)
+    let booked_slot = await service.createSlot(req.body.sitter, req.body.begDateime, req.body.endDateTime);
     res.status(200).json({
       status: "success",
       data: booked_slot.dataValues,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
+      status: "failed",
+      message: "could not create slot",
+    });
+  }
+})
+
+app.put("/book_slot" , validate.Verify, async (req, res) => {
+  try {
+    let booked_slot = await service.bookSlot(req.user.userId, req.body.slotId);
+    res.status(200).json({
+      status: "success",
+      data: booked_slot,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      message: "could not book slot",
+    });
+  }
+})
+
+app.put("/accept_booking" , validate.Verify, async (req, res) => {
+  try {
+    let booked_slot = await service.acceptBooking(req.body.slotId);
+    res.status(200).json({
+      status: "success",
+      data: booked_slot,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      message: "could not accept slot",
+    });
+  }
+})
+
+app.get("/get_sitter_slots" , validate.Verify, async (req, res) => {
+  try {
+    let slots = await service.getSlotsBySitter(req.body.sitterId)
+    res.status(200).json({
+      status: "success",
+      data: slots,
+    });
+  } catch(error) {
+    res.status(500).json({
       status: "failed",
       message: "could not book slot",
     });

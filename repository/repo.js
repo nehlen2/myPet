@@ -84,7 +84,7 @@ sequelize.sync();
 exports.findUserByEmail = async function (email) {
   let user = await User.findOne({
     where: { email: email },
-	attributes: ["name", "email", "role", "password"]
+	attributes: ["userId","name", "email", "role", "password"]
   });
   return user;
 };
@@ -101,12 +101,9 @@ exports.createUser = async function (name, email, password, role) {
 };
 
 exports.sequelize = sequelize;
-exports.User = User;
 
 
 exports.createSlot = async function (sitter, beginDateTime, endDateTime) {
-  console.log(beginDateTime)
-  console.log(endDateTime)
   try {
     let slot = await Slot.create({
       sitter: sitter,
@@ -118,5 +115,53 @@ exports.createSlot = async function (sitter, beginDateTime, endDateTime) {
   } catch (error) {
     console.error(error);
   }
+}
 
+exports.bookSlot = async function (user, slotId) {
+  try {
+    return await Slot.update(
+      { owner: user,
+        status: "pending"
+      }, 
+      {
+        where: {slotId : slotId}
+      });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+exports.acceptBookig = async function (slotId) {
+  try {
+    return await Slot.update(
+      { 
+        status: "booked"
+      }, 
+      {
+        where: {slotId : slotId}
+      });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+exports.findAllUsers = async () =>  {
+  try {
+    return await User.findAll();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+exports.findSlotsBySitter = async (sitterId) =>  {
+  try {
+    let bookings = await Slot.findAll(
+      {
+          where: {sitter : sitterId}
+      }
+    );
+    return bookings;
+  } catch (error) {
+    console.error(error);
+  }
 }

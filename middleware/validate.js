@@ -1,7 +1,6 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const userService = require("../service/service.js");
-const { User, findUserByEmail } = require("../repository/repo.js");
+const { findUserByEmail } = require("../repository/repo.js");
 
 
 const Validate = (req, res, next) => {
