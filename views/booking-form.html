@@ -25,14 +25,14 @@
     <p><small>By confirming this booking, you agree to our <a href="#">Terms and Conditions</a> and <a href="#">Privacy Policy</a>.</small></p>
   </div>
 
-  
+  {{> footer}}
   <script>
     $(document).ready(function(){
       $('#confirmButton').click(function(){
         $('#confirmationMessage').show();
       });
-    });
+    }); 
   </script>
-  {{> footer}}
+  
 </body>
 </html>
