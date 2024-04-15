@@ -27,16 +27,17 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-header text-center">
-            <h3>Log In</h3>
-            
-              <div class="alert alert-danger" role="alert">
-                  
-              </div>
+            <h3>Register</h3>
+            {{#message}}
+            <div class="alert alert-danger" role="alert"> 
+              {{message}}   
+            </div>
+            {{/message}}
 
 
           </div>
             <div class="card-body">
-            <form action="/registr" method="POST">
+            <form action="/register" method="POST">
               <div class="form-group">
               <label for="email">Email address</label>
               <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
@@ -44,10 +45,13 @@
               <label for="email">Name</label>
               <input type="name" class="form-control" id="name" name="name"  placeholder="Enter name">
               <label for="email">Password</label>
-              <input type="password" class="form-control" id="password" name="password" aria-describedby="passwordHelp" placeholder="Enter password">
-              
-            </div>
-              <button type="submit" class="btn btn-primary btn-block">Submit</button>
+              <input type="password" class="form-control" id="password" name="password" aria-describedby="passwordHelp" placeholder="Enter password"><br>
+              <label>Role</label><br>
+              <label><input type="radio" name="role" value="sitter">Sitter</label><br>
+              <label><input type="radio" name="role" value="owner">Owner</label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block"style="background-color: purple ; color: white;">Submit</button>
+
             </form>
             </div>
           </div>
