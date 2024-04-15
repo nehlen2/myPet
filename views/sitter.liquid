@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animal Sitter Page</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .sitter-img {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 20px;
+      }
+      .time-slot-button {
+        margin-right: 5px;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    {{> navbar}}
+    <div class="container">
+      <div class="row mt-5">
+        <div class="col-md-6">
+          <img
+            src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png"
+            alt="Cat Sitter"
+            class="sitter-img"
+          />
+          <h2>John Doe</h2>
+          <p>1234 Elm Street, Anytown, USA</p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget
+            purus vitae odio aliquet sagittis.
+          </p>
+          <h4>Available Time Slots:</h4>
+          <div class="btn-group-vertical">
+            <a href="/booking-form">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm time-slot-button"
+                href="/booking-form"
+              >
+                8:00 AM - 10:00 AM
+              </button></a
+            >
+            <a href="/booking-form">
+				<button
+				  type="button"
+				  class="btn btn-primary btn-sm time-slot-button"
+				  href="/booking-form"
+				>
+				  8:00 AM - 10:00 AM
+				</button></a
+			  >
+			  <a href="/booking-form">
+				<button
+				  type="button"
+				  class="btn btn-primary btn-sm time-slot-button"
+				  href="/booking-form"
+				>
+				  8:00 AM - 10:00 AM
+				</button></a
+			  >
+			  <a href="/booking-form">
+				<button
+				  type="button"
+				  class="btn btn-primary btn-sm time-slot-button"
+				  href="/booking-form"
+				>
+				  8:00 AM - 10:00 AM
+				</button></a
+			  >
+            <!-- Add more time slots here -->
+          </div>
+        </div>
+      </div>
+    </div>
+    {{> footer}}
+  </body>
+</html>

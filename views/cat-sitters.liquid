@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cat Sitters</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+  <style>
+    .cat-sitter-card {
+      width: 100%; /* Set the width of each card */
+    }
+    .cat-sitter-image {
+      width: 50px; /* Set the width of the round image */
+      height: 50px; /* Set the height of the round image */
+      border-radius: 50%; /* Make the image round */
+    }
+    .time-slot-button {
+      margin-right: 5px; /* Add some margin between the buttons */
+      margin-bottom: 5px; /* Add some margin between the buttons and bio */
+    }
+    .clickable-div {
+	cursor: pointer;
+  }
+.clickable-div:hover {
+	transform: scale(1.1); /* Zoom in by 10% */
+  } 
+  </style>
+</head>
+<body>
+{{> navbar}}
+  <div class="container py-4">
+    <h1 class="text-center mt-5 mb-4">Cat Sitters</h1>
+    <div class="row">
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <a href="/sitter">
+              <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 1">
+            </a>
+            <h5 class="card-title">John Doe</h5>
+            <p class="card-text">1234 Elm Street, Anytown, USA</p>
+            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget purus vitae odio aliquet sagittis.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">8:00 AM - 10:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">1:00 PM - 3:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">6:00 PM - 8:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-4">
+        <div class="card cat-sitter-card">
+          <div class="card-body">
+            <img src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png" class="cat-sitter-image float-left mr-3 clickable-div" alt="Cat Sitter 2">
+            <h5 class="card-title">Jane Smith</h5>
+            <p class="card-text">5678 Oak Street, Anycity, USA</p>
+            <p class="card-text">Suspendisse potenti. Sed bibendum luctus lectus.</p>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">9:00 AM - 11:00 AM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">2:00 PM - 4:00 PM</button>
+            <button type="button" class="btn btn-primary btn-sm time-slot-button">7:00 PM - 9:00 PM</button>
+          </div>
+        </div>
+      </div>
+      <!-- Add more card divs as needed for additional cat sitters -->
+    </div>
+  </div>
+  {{> footer}}
+</body>
+</html>

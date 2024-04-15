@@ -1,0 +1,11 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	background: linear-gradient(to right, #667eea, #764ba2); /* Gradient background */
+	color: #131212; /* Text color */
+	min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+

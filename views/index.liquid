@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!--Bootstrap config-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">        
+        <link rel="stylesheet" href="styles.css"> 
+        <style>
+          h2 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            color: #ebe7e7;
+          }
+          body {
+            background: linear-gradient(to right, #667eea, #764ba2); /* Gradient background */
+          }       
+          .clickable-div {
+	cursor: pointer;
+  }
+.clickable-div:hover {
+	background-color: #97b0cc; /* Darker blue */
+	transform: scale(1.1); /* Zoom in by 10% */
+	transition: transform 0.3s; /* Smooth transition for the scale effect */
+  } 
+          </style>
+        <title>My Pet</title>
+    </head>
+
+    <body>
+      {% render 'navbar.liquid' %}
+
+    <div class="container py-4">
+            <h2 class="text-center mb-4">Welcome to our Pet Sitting Services</h2>
+            <p class="text-center" style="color: #ebe7e7;">We offer professional and reliable pet sitting services to ensure your furry friends are well taken care of while you're away.</p>
+        <div class="card-deck">
+            <div class="card clickable-div" onclick="location.href='/cat-sitters'">
+              <img class="card-img-top" src="https://animal-societe.com/wp-content/uploads/2023/06/Nuggetz_golden_retriever_adult_next_to_golden_retriever_puppy_da1df69d-dc54-4c46-8892-c832e9c764ce.png" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Dog sitting</h5>
+                <p class="card-text" style="color: #131212; font-size: 1.2rem">We provide in-home dog sitting services tailored to meet your dog's specific needs.</p>
+              </div>
+            </div>
+            <div class="card clickable-div">
+              <img class="card-img-top" src="https://www.breatheazy.co.uk/wp-content/uploads/2023/09/Untitled-design-35-1080x675.png" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Cat sitting</h5>
+                <p class="card-text" style="color: #131212; font-size: 1.2rem">Our experienced cat sitters will visit your home to feed, play, and care for your feline companions.</p>
+              </div>
+            </div>
+            <div class="card clickable-div">
+              <img class="card-img-top" src="https://images.wagwalkingweb.com/media/daily_wag/blog_articles/hero/1642800424.549621/how-to-walk-bigger-dogs-on-dog-walks.png" alt="Card image cap">
+              <div class="card-body">
+                <h5 class="card-title">Pet Walking</h5>
+                <p class="card-text" style="color: #131212; font-size: 1.2rem">Keep your pets active and healthy with our pet walking services. We'll take them for a stroll around the neighborhood.</p>
+              </div>
+            </div>
+          </div>
+    </div>
+
+
+    {% render 'footer.liquid' %}
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>   
+    </body>
+</html>
