@@ -62,19 +62,48 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/contact", (req, res) => {
-  res.render("contact");
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("contact", {user : cookie})
+  } else {
+    res.render("contact");
+  }
 });
 
-app.get("/cat-sitters", (req, res) => {
-  res.render("cat-sitters");
+app.get("/sitters", (req, res) => {
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("sitters", {user : cookie})
+  } else {
+    res.render("sitters");
+  }
 });
 
 app.get("/sitter", (req, res) => {
-  res.render("sitter");
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("sitter", {user : cookie})
+  } else {
+    res.render("sitter");
+  }
+});
+
+app.get("/register", (req, res) => {
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("register", {user : cookie})
+  } else {
+    res.render("register");
+  }
 });
 
 app.get("/booking-form", (req, res) => {
-  res.render("booking-form");
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("booking-form", {user : cookie})
+  } else {
+    res.render("booking-form");
+  }
 });
 
 app.get("/test", validate.Verify, (req, res) => {
@@ -194,7 +223,7 @@ app.get("/logout" , async (req, res) => {
     res.clearCookie("user");
     res.redirect("/")
   } catch(error) {
-
+      console.error(error)
   }
 })
 
