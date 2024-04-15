@@ -54,7 +54,7 @@ const Slot = sequelize.define("slot", {
   },
   owner: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
   },
   beginDateTime: {
     type: DataTypes.DATE,
@@ -89,23 +89,34 @@ exports.findUserByEmail = async function (email) {
   return user;
 };
 
-exports.createUser = function (name, email, password, role) {
-  try {
-    return  User.create({
+exports.createUser = async function (name, email, password, role) {
+
+    return await User.create({
       name: name,
       email: email,
       password: password,
       role: role,
     });
-  } catch (err) {
-    res.status(500).json({
-      status: "error",
-      code: 500,
-      data: [],
-      message: "Internal Server Error",
-    });
-  }
+ 
 };
 
 exports.sequelize = sequelize;
 exports.User = User;
+
+
+exports.createSlot = async function (sitter, beginDateTime, endDateTime) {
+  console.log(beginDateTime)
+  console.log(endDateTime)
+  try {
+    let slot = await Slot.create({
+      sitter: sitter,
+      beginDateTime: beginDateTime,
+      endDateTime: endDateTime,
+      status: "free"
+    });
+    return slot;
+  } catch (error) {
+    console.error(error);
+  }
+
+}

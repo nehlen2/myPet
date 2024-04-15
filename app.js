@@ -5,7 +5,7 @@ const mustacheExpress = require("mustache-express");
 var fs = require("fs");
 const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
-const userService = require("./service/userService.js");
+const service = require("./service/service.js");
 const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate.js");
 const repo = require("./repository/repo.js");
@@ -80,7 +80,7 @@ app.get("/test", validate.Verify, (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  let user = await userService.login(req.body.email, req.body.password);
+  let user = await service.login(req.body.email, req.body.password);
   if (user !== undefined && user !== null) {
     let options = {
       maxAge: 20 * 60 * 1000, // would expire in 20minutes
@@ -88,12 +88,12 @@ app.post("/login", async (req, res) => {
       secure: true,
       sameSite: "None",
     };
-    const token = userService.generateAccessJWT(user.dataValues); // generate session token for user
+    const token = service.generateAccessJWT(user.dataValues); // generate session token for user
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
     req.session.email = user.dataValues.email;
     res.status(200).json({
       status: "success",
-      data: [],
+      data: {token},
       message: "Welcome to our API homepage!",
     });
     //res.render("index", { user: user.dataValues });
@@ -112,7 +112,7 @@ app.get("/logout", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  let registred = await userService.register(
+  let registred = await service.register(
     req.body.name,
     req.body.email,
     req.body.password,
@@ -132,6 +132,21 @@ app.post("/register", async (req, res) => {
     });
   }
 });
+
+app.post("/book_slot" , validate.Verify, async (req, res) => {
+  try {
+    let booked_slot = await service.createSlot(req.body.sitter, req.body.beginDateTime, req.body.endDateTime);
+    res.status(200).json({
+      status: "success",
+      data: booked_slot.dataValues,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "failed",
+      message: "could not book slot",
+    });
+  }
+})
 
 //start the server
 app.listen(PORT, () => {

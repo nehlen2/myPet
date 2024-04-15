@@ -1,6 +1,6 @@
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const userService = require("../service/userService.js");
+const userService = require("../service/service.js");
 const { User, findUserByEmail } = require("../repository/repo.js");
 
 
@@ -21,8 +21,7 @@ exports.Verify = function (req, res, next) {
     const authHeader = req.headers["cookie"]; // get the session cookie from request header
 
     if (!authHeader) return res.sendStatus(401); // if there is no cookie from request header, send an unauthorized response.
-    const cookie = authHeader.split("=")[1]; // If there is, split the cookie string to get the actual jwt
-    console.log(cookie)
+    const cookie = authHeader.split("=")[1].split(";")[0]; // If there is, split the cookie string to get the actual jwt
     // Verify using jwt to see if token has been tampered with or if it has expired.
     // that's like checking the integrity of the cookie
     jwt.verify(cookie, SECRET_ACCESS_TOKEN, async (err, decoded) => {
@@ -30,12 +29,11 @@ exports.Verify = function (req, res, next) {
         // if token has been altered or has expired, return an unauthorized error
         return res
           .status(401)
-          .json({ message: "This session has expired. Please login" });
+          .json({ message: err });
       }
 
       const { user } = decoded; // get user id from the decoded token
       const foundUSer = await findUserByEmail(user.email)// find user by that `id`
-      console.log(foundUSer.dataValues)
       const { password, ...data } = foundUSer.dataValues; // return user object without the password
       req.user = data; // put the data object into req.user
       next();

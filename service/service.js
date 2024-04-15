@@ -1,4 +1,4 @@
-const { findUserByEmail, createUser } = require("../repository/repo");
+const { findUserByEmail, createUser, createSlot } = require("../repository/repo");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
@@ -31,7 +31,14 @@ exports.generateAccessJWT = function (user) {
     let payload = {
       user: user,
     };
-    return jwt.sign(payload, SECRET_ACCESS_TOKEN, {
-      expiresIn: '20m',
-    });
-  };
+    return jwt.sign(payload, SECRET_ACCESS_TOKEN);
+  }
+
+  exports.createSlot = async function (sitter, beginDateTime, endDateTime) {
+    try {
+      return await createSlot(sitter, beginDateTime, endDateTime);
+    } catch (error) {
+      console.error("service could not create slot")
+    }
+
+  }
