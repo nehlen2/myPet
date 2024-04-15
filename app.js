@@ -8,7 +8,7 @@ const cookieSession = require("cookie-session");
 const service = require("./service/service.js");
 const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate.js");
-const repo = require("./repository/repo.js");
+
 
 // configure mustache as template engine
 app.engine("html", mustacheExpress());
@@ -29,12 +29,12 @@ app.use(
   })
 );
 
+
 app.use(
-  cookieSession({
-    secret: "mot-de-passe-du-cookie",
-  })
+  cookieParser()
 );
 
+/*
 app.use(function (req, res, next) {
   if (req.session && req.session.email !== undefined) {
     res.locals.authenticated = true;
@@ -42,14 +42,19 @@ app.use(function (req, res, next) {
   }
   return next();
 });
+*/
+
+// global var 
+
 
 // define routes
 app.get("/", async (req, res) => {
-  console.log(req.session.email);
-  res.render("index", {
-    user: req.session.email,
-    status: res.locals.authenticated,
-  });
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("index", {user : cookie})
+  } else {
+    res.render("index");
+  }
 });
 
 app.get("/login", (req, res) => {
@@ -57,19 +62,48 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/contact", (req, res) => {
-  res.render("contact");
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("contact", {user : cookie})
+  } else {
+    res.render("contact");
+  }
 });
 
-app.get("/cat-sitters", (req, res) => {
-  res.render("cat-sitters");
+app.get("/sitters", (req, res) => {
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("sitters", {user : cookie})
+  } else {
+    res.render("sitters");
+  }
 });
 
 app.get("/sitter", (req, res) => {
-  res.render("sitter");
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("sitter", {user : cookie})
+  } else {
+    res.render("sitter");
+  }
+});
+
+app.get("/register", (req, res) => {
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("register", {user : cookie})
+  } else {
+    res.render("register");
+  }
 });
 
 app.get("/booking-form", (req, res) => {
-  res.render("booking-form");
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("booking-form", {user : cookie})
+  } else {
+    res.render("booking-form");
+  }
 });
 
 app.get("/test", validate.Verify, (req, res) => {
@@ -88,28 +122,17 @@ app.post("/login", async (req, res) => {
       secure: true,
       sameSite: "None",
     };
-    const token = service.generateAccessJWT(user.dataValues); // generate session token for user
+    const token = service.generateAccessJWT(user); // generate jwt token for user
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
-    req.session.email = user.dataValues.email;
-    res.status(200).json({
-      status: "success",
-      data: {token},
-      message: "Welcome to our API homepage!",
-    });
+    authenticated = "true";
+    res.cookie('user',user, { maxAge: 900000, httpOnly: true });
+    res.redirect("/")
     //res.render("index", { user: user.dataValues });
   } else {
-    res.status(401).json({
-      status: "error",
-      message: "Incorrect username or password",
-    });
-    //res.render("login", { message: "Invalid email or password" })
+    res.render("login", { message: "Invalid email or password" })
   }
 });
 
-app.get("/logout", (req, res) => {
-  req.session = null;
-  res.redirect("/");
-});
 
 app.post("/register", async (req, res) => {
   let registred = await service.register(
@@ -122,29 +145,85 @@ app.post("/register", async (req, res) => {
   if (registred !== undefined) {
     res.status(200).json({
       status: "success",
-      data: registred.dataValues,
+      data: registred,
       message: "Welcome to our API homepage!",
     });
   } else {
-    res.status(400).json({
+    res.status(500).json({
       status: "failed",
       message: "could not register",
     });
   }
 });
 
-app.post("/book_slot" , validate.Verify, async (req, res) => {
+app.post("/create_slot" , validate.Verify, async (req, res) => {
   try {
-    let booked_slot = await service.createSlot(req.body.sitter, req.body.beginDateTime, req.body.endDateTime);
+    console.log(req.body, req.body.beginDateTime, req.body.endDateTime)
+    let booked_slot = await service.createSlot(req.body.sitter, req.body.begDateime, req.body.endDateTime);
     res.status(200).json({
       status: "success",
       data: booked_slot.dataValues,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
+      status: "failed",
+      message: "could not create slot",
+    });
+  }
+})
+
+app.put("/book_slot" , validate.Verify, async (req, res) => {
+  try {
+    let booked_slot = await service.bookSlot(req.user.userId, req.body.slotId);
+    res.status(200).json({
+      status: "success",
+      data: booked_slot,
+    });
+  } catch (err) {
+    res.status(500).json({
       status: "failed",
       message: "could not book slot",
     });
+  }
+})
+
+app.put("/accept_booking" , validate.Verify, async (req, res) => {
+  try {
+    let booked_slot = await service.acceptBooking(req.body.slotId);
+    res.status(200).json({
+      status: "success",
+      data: booked_slot,
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "failed",
+      message: "could not accept slot",
+    });
+  }
+})
+
+app.get("/get_sitter_slots" , validate.Verify, async (req, res) => {
+  try {
+    let slots = await service.getSlotsBySitter(req.body.sitterId)
+    res.status(200).json({
+      status: "success",
+      data: slots,
+    });
+  } catch(error) {
+    res.status(500).json({
+      status: "failed",
+      message: "could not book slot",
+    });
+  }
+})
+
+app.get("/logout" , async (req, res) => {
+  try {
+    res.clearCookie("Authorization");
+    res.clearCookie("user");
+    res.redirect("/")
+  } catch(error) {
+      console.error(error)
   }
 })
 
