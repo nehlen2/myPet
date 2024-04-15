@@ -18,7 +18,7 @@ exports.login = async function (email, password) {
 exports.register = async function (name, email, password, role) {
   let userFound = await findUserByEmail(email);
   if (userFound !== null) {
-    console.error("User already registred");
+    throw new Error("User already registred");
   } else {
     let created = await createUser(name, email, password, role);
     delete created.dataValues.password;

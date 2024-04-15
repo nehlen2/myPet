@@ -89,12 +89,7 @@ app.get("/sitter", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  let cookie = req.cookies.user;
-  if( cookie !== undefined ) {
-    res.render("register", {user : cookie})
-  } else {
     res.render("register");
-  }
 });
 
 app.get("/booking-form", (req, res) => {
@@ -106,12 +101,6 @@ app.get("/booking-form", (req, res) => {
   }
 });
 
-app.get("/test", validate.Verify, (req, res) => {
-  res.status(200).json({
-    status: "success",
-    message: "Welcome to the your Dashboard!",
-  });
-});
 
 app.post("/login", async (req, res) => {
   let user = await service.login(req.body.email, req.body.password);
@@ -126,8 +115,11 @@ app.post("/login", async (req, res) => {
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
     authenticated = "true";
     res.cookie('user',user, { maxAge: 900000, httpOnly: true });
-    res.redirect("/")
-    //res.render("index", { user: user.dataValues });
+    if(user.role === "sitter") {
+      res.redirect("/sitter-admin")
+    } else {
+      res.redirect("/")
+    }
   } else {
     res.render("login", { message: "Invalid email or password" })
   }
@@ -135,24 +127,31 @@ app.post("/login", async (req, res) => {
 
 
 app.post("/register", async (req, res) => {
-  let registred = await service.register(
-    req.body.name,
-    req.body.email,
-    req.body.password,
-    req.body.role
-  );
+  try {
+    let user = await service.register(
+      req.body.name,
+      req.body.email,
+      req.body.password,
+      req.body.role
+    );
+    let options = {
+      maxAge: 20 * 60 * 1000, // would expire in 20minutes
+      httpOnly: true, // The cookie is only accessible by the web server
+      secure: true,
+      sameSite: "None",
+    };
 
-  if (registred !== undefined) {
-    res.status(200).json({
-      status: "success",
-      data: registred,
-      message: "Welcome to our API homepage!",
-    });
-  } else {
-    res.status(500).json({
-      status: "failed",
-      message: "could not register",
-    });
+    const token = service.generateAccessJWT(user); // generate jwt token for user
+    res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
+    authenticated = "true";
+    res.cookie('user',user, { maxAge: 900000, httpOnly: true });
+    if(user.role === "sitter") {
+      res.redirect("/sitter-admin")
+    } else {
+      res.redirect("/")
+    }
+  } catch(error) {
+    res.render("register", { message: "User already registered" })
   }
 });
 
@@ -226,6 +225,15 @@ app.get("/logout" , async (req, res) => {
       console.error(error)
   }
 })
+
+app.get("/test", (req, res) => {
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("test", {user : cookie})
+  } else {
+    res.render("test");
+  }
+});
 
 //start the server
 app.listen(PORT, () => {
