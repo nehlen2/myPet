@@ -7,9 +7,9 @@ const jwt = require('jsonwebtoken');
 exports.login = async function (email, password) {
   const user = await findUserByEmail(email);
   if (user !== undefined && user !== null) {
-    const isPasswordValid = await bcrypt.compare(password,user.password);
-    console.log(isPasswordValid);
-    return isPasswordValid ? user : null;
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    delete user.dataValues.password;
+    return isPasswordValid ? user.dataValues : null;
   } else {
     console.error("User not found");
   }
@@ -17,12 +17,12 @@ exports.login = async function (email, password) {
 
 exports.register = async function (name, email, password, role) {
   let userFound = await findUserByEmail(email);
-
   if (userFound !== null) {
     console.error("User already registred");
   } else {
     let created = await createUser(name, email, password, role);
-    return created;
+    delete created.dataValues.password;
+    return created.dataValues;
   }
 };
 

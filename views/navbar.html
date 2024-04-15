@@ -32,19 +32,22 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mx-auto">
-            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">About Us</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+            <li class="nav-item"><a class="nav-link" href="/">Accueil</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">A propos de nous</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Nos Services</a></li>
             <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
           </ul>
 
           <ul class="navbar-nav">
-            
-            
             <li class="nav-item">
+              {{#user}}
+              <a href="/profile" style="padding-right: 20px;" >Bonjour, {{user.name}}</a>
+              <a class="btn btn-primary"  href="/logout">Déconnexion</a>
+              {{/user}}
+              {{^user}}
               <a class="btn btn-primary" href="/login">Connexion</a>
+              {{/user}}
             </li>
-            
           </ul>
 
         </div>

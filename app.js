@@ -29,12 +29,12 @@ app.use(
   })
 );
 
+
 app.use(
-  cookieSession({
-    secret: "mot-de-passe-du-cookie",
-  })
+  cookieParser()
 );
 
+/*
 app.use(function (req, res, next) {
   if (req.session && req.session.email !== undefined) {
     res.locals.authenticated = true;
@@ -42,14 +42,19 @@ app.use(function (req, res, next) {
   }
   return next();
 });
+*/
+
+// global var 
+
 
 // define routes
 app.get("/", async (req, res) => {
-  console.log(req.session.email);
-  res.render("index", {
-    user: req.session.email,
-    status: res.locals.authenticated,
-  });
+  let cookie = req.cookies.user;
+  if( cookie !== undefined ) {
+    res.render("index", {user : cookie})
+  } else {
+    res.render("index");
+  }
 });
 
 app.get("/login", (req, res) => {
@@ -88,28 +93,17 @@ app.post("/login", async (req, res) => {
       secure: true,
       sameSite: "None",
     };
-    const token = service.generateAccessJWT(user.dataValues); // generate session token for user
+    const token = service.generateAccessJWT(user); // generate jwt token for user
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
-    req.session.email = user.dataValues.email;
-    res.status(200).json({
-      status: "success",
-      data: {token},
-      message: "Welcome to our API homepage!",
-    });
+    authenticated = "true";
+    res.cookie('user',user, { maxAge: 900000, httpOnly: true });
+    res.redirect("/")
     //res.render("index", { user: user.dataValues });
   } else {
-    res.status(401).json({
-      status: "error",
-      message: "Incorrect username or password",
-    });
-    //res.render("login", { message: "Invalid email or password" })
+    res.render("login", { message: "Invalid email or password" })
   }
 });
 
-app.get("/logout", (req, res) => {
-  req.session = null;
-  res.redirect("/");
-});
 
 app.post("/register", async (req, res) => {
   let registred = await service.register(
@@ -122,7 +116,7 @@ app.post("/register", async (req, res) => {
   if (registred !== undefined) {
     res.status(200).json({
       status: "success",
-      data: registred.dataValues,
+      data: registred,
       message: "Welcome to our API homepage!",
     });
   } else {
@@ -132,8 +126,6 @@ app.post("/register", async (req, res) => {
     });
   }
 });
-
-app.get
 
 app.post("/create_slot" , validate.Verify, async (req, res) => {
   try {
@@ -193,6 +185,16 @@ app.get("/get_sitter_slots" , validate.Verify, async (req, res) => {
       status: "failed",
       message: "could not book slot",
     });
+  }
+})
+
+app.get("/logout" , async (req, res) => {
+  try {
+    res.clearCookie("Authorization");
+    res.clearCookie("user");
+    res.redirect("/")
+  } catch(error) {
+
   }
 })
 
