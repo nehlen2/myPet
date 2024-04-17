@@ -36,6 +36,14 @@ const User = sequelize.define("user", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  city: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  postalCode: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   role: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -70,6 +78,11 @@ const Slot = sequelize.define("slot", {
   },
 });
 
+User.hasMany(Slot, {
+  foreignKey: 'sitter',
+});
+Slot.belongsTo(User);
+
 User.beforeCreate(async (user, options) => {
   if (user.changed("password")) {
     const saltRounds = 10;
@@ -79,23 +92,23 @@ User.beforeCreate(async (user, options) => {
   }
 });
 
-sequelize.sync();
-
 exports.findUserByEmail = async function (email) {
   let user = await User.findOne({
     where: { email: email },
-	attributes: ["userId","name", "email", "role", "password"]
+	attributes: ["userId","name", "email", "city", "postalCode", "role","password"]
   });
   return user;
 };
 
-exports.createUser = async function (name, email, password, role) {
+exports.createUser = async function (name, email, password, city, postalCode, role) {
 
     return await User.create({
       name: name,
       email: email,
       password: password,
-      role: role,
+      city: city,
+      postalCode: postalCode,
+      role: role
     });
  
 };
@@ -153,6 +166,17 @@ exports.findAllUsers = async () =>  {
   }
 }
 
+exports.findAllSitters = async () => {
+    try {
+      let sitters = await User.findAll({
+        where: {role : "sitter"}
+      });
+      return sitters;
+    } catch (error) {
+      console.error(error);
+    }
+}
+
 exports.findSlotsBySitter = async (sitterId) =>  {
   try {
     let bookings = await Slot.findAll(
@@ -161,6 +185,16 @@ exports.findSlotsBySitter = async (sitterId) =>  {
       }
     );
     return bookings;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+exports.getUserById = async (userId) => {
+  try {
+    return await User.findOne({
+      where: {userId : userId}
+    });
   } catch (error) {
     console.error(error);
   }

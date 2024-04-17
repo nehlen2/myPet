@@ -4,7 +4,6 @@ const PORT = process.env.PORT || 3000;
 const mustacheExpress = require("mustache-express");
 var fs = require("fs");
 const bodyParser = require("body-parser");
-const cookieSession = require("cookie-session");
 const service = require("./service/service.js");
 const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate.js");
@@ -34,24 +33,15 @@ app.use(
   cookieParser()
 );
 
-/*
-app.use(function (req, res, next) {
-  if (req.session && req.session.email !== undefined) {
-    res.locals.authenticated = true;
-    res.locals.email = req.session.email;
-  }
-  return next();
-});
-*/
-
 // global var 
 
 
 // define routes
 app.get("/", async (req, res) => {
+  // check authenticated user
   let cookie = req.cookies.user;
-  if( cookie !== undefined ) {
-    res.render("index", {user : cookie})
+  if( cookie !== undefined) {
+    res.render("index", {user : cookie, message: req.query.message})
   } else {
     res.render("index");
   }
@@ -70,12 +60,23 @@ app.get("/contact", (req, res) => {
   }
 });
 
-app.get("/sitters", (req, res) => {
+app.get("/sitters/:animal", async (req, res) => {
   let cookie = req.cookies.user;
   if( cookie !== undefined ) {
-    res.render("sitters", {user : cookie})
+    let sitters = await service.getAllSitters();
+    sitters = await service.filterByCity(sitters, cookie.city);
+    if (sitters.length !== 0) {
+      sitters = await service.appendWithNextAvailableSlot(sitters);
+      res.render("sitters", {user : cookie, animal : req.params.animal, sitters : sitters});
+    } else {
+      sitters = await service.getAllSitters();
+      sitters = await service.appendWithNextAvailableSlot(sitters);
+      res.render("sitters", {user : cookie, sitters : sitters, animal : req.params.animal, message: "No sitters found in your area. Showing all sitters instead."})
+    }
   } else {
-    res.render("sitters");
+    let sitters = await service.getAllSitters();
+    sitters = await service.appendWithNextAvailableSlot(sitters);
+    res.render("sitters", {animal : req.params.animal, sitters : sitters, message : "Please login to search for sitter in your city"});
   }
 });
 
@@ -92,15 +93,6 @@ app.get("/register", (req, res) => {
     res.render("register");
 });
 
-app.get("/booking-form", (req, res) => {
-  let cookie = req.cookies.user;
-  if( cookie !== undefined ) {
-    res.render("booking-form", {user : cookie})
-  } else {
-    res.render("booking-form");
-  }
-});
-
 
 app.post("/login", async (req, res) => {
   let user = await service.login(req.body.email, req.body.password);
@@ -114,7 +106,7 @@ app.post("/login", async (req, res) => {
     const token = service.generateAccessJWT(user); // generate jwt token for user
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
     authenticated = "true";
-    res.cookie('user',user, { maxAge: 900000, httpOnly: true });
+    res.cookie('user' ,user, { maxAge:  20 * 60 * 1000, httpOnly: true });
     if(user.role === "sitter") {
       res.redirect("/sitter-admin")
     } else {
@@ -125,6 +117,15 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/sitter-admin", validate.Verify, async (req, res) => {
+  let cookie = req.cookies.user;
+  if( cookie !== undefined && cookie.role === "sitter") {
+    res.render("sitter-admin", {user : cookie})
+  } else {
+    res.render("login");
+  }
+});
+
 
 app.post("/register", async (req, res) => {
   try {
@@ -132,7 +133,9 @@ app.post("/register", async (req, res) => {
       req.body.name,
       req.body.email,
       req.body.password,
-      req.body.role
+      req.body.city,
+      req.body.postalCode,
+      req.body.sitter ? "sitter" : "owner"
     );
     let options = {
       maxAge: 20 * 60 * 1000, // would expire in 20minutes
@@ -144,7 +147,7 @@ app.post("/register", async (req, res) => {
     const token = service.generateAccessJWT(user); // generate jwt token for user
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
     authenticated = "true";
-    res.cookie('user',user, { maxAge: 900000, httpOnly: true });
+    res.cookie('user', user, { maxAge: 900000, httpOnly: true });
     if(user.role === "sitter") {
       res.redirect("/sitter-admin")
     } else {
@@ -157,7 +160,6 @@ app.post("/register", async (req, res) => {
 
 app.post("/create_slot" , validate.Verify, async (req, res) => {
   try {
-    console.log(req.body, req.body.beginDateTime, req.body.endDateTime)
     let booked_slot = await service.createSlot(req.body.sitter, req.body.begDateime, req.body.endDateTime);
     res.status(200).json({
       status: "success",
@@ -171,18 +173,12 @@ app.post("/create_slot" , validate.Verify, async (req, res) => {
   }
 })
 
-app.put("/book_slot" , validate.Verify, async (req, res) => {
+app.post("/book_slot/:slotId" , validate.Verify, async (req, res) => {
   try {
-    let booked_slot = await service.bookSlot(req.user.userId, req.body.slotId);
-    res.status(200).json({
-      status: "success",
-      data: booked_slot,
-    });
+    let booked_slot = await service.bookSlot(req.user.userId, req.params.slotId);
+    res.render("index", {message: "Slot booked successfully"})
   } catch (err) {
-    res.status(500).json({
-      status: "failed",
-      message: "could not book slot",
-    });
+    res.render("sitters", {message: "could not book slot"})
   }
 })
 
@@ -226,12 +222,24 @@ app.get("/logout" , async (req, res) => {
   }
 })
 
-app.get("/test", (req, res) => {
+app.get("/profile", (req, res) => {
   let cookie = req.cookies.user;
   if( cookie !== undefined ) {
-    res.render("test", {user : cookie})
+    res.render("profile", {user : cookie})
   } else {
-    res.render("test");
+    res.render("profile");
+  }
+});
+
+app.get("/sitters/sitter/:sitterId", async (req, res) => {
+  console.log(req.params.sitterId)
+  let cookie = req.cookies.user;
+  let sitter = await service.getSitterById(req.params.sitterId);
+  sitter = await service.appendWithNextAvailableSlots(sitter);
+  if( cookie !== undefined ) {
+    res.render("sitter", {user : cookie, sitter : sitter})
+  } else {
+    res.render("sitter", {sitter : sitter});
   }
 });
 

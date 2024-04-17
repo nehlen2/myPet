@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <title>Sitter admin</title>
+  </head>
+  <body>
+    {{> navbar}}
+    <div class="flex items-start justify-start h-screen w-screen">
+      <div class="bg-white shadow-md rounded p-8 mx-12 mt-12 w-screen flex">
+        <div class="h-24 w-24">
+          <div class="avatar">
+            <div class="w-24 rounded-full">
+              <img
+                src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+              />
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+        <div class="mx-12">
+          <div>
+            <p class="font-semibold">{{user.name}}</p>
+			<p>{{user.postalCode}}, {{user.city}}</p>
+            <hr class="p-2 mt-4" />
+          </div>
+          <div>
+            <p class="font-semibold my-6">My bookings</p>
+            <div>
+              <p class="font-semibold mb-2">Pending for validation</p>
+              <button
+                class="btn btn-secondary mr-4 mb-4"
+                onclick="validation_modal.showModal()"
+              >
+                Tue 1:30 PM - Tue 2:30 PM
+              </button>
+              <!-- Open the modal using ID.showModal() method -->
+              <dialog id="validation_modal" class="modal">
+                <div class="modal-box">
+                  <h3 class="font-bold text-lg">Validate!</h3>
+                  <p class="py-4">
+                    Do you confirm validation for this time slot? Press ESC key
+                    or click the button below to close
+                  </p>
+                  <div class="modal-action">
+                    <form action="/book_slot/{{slotId}}" method="POST">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn btn-success">Confirm</button>
+                      <button class="btn">Close</button>
+                    </form>
+                  </div>
+                </div>
+              </dialog>
+              <hr class="p-2 mt-4" />
+            </div>
+            <div>
+              <p class="font-semibold mb-2">Verified</p>
+              <button
+                class="btn btn-accent mr-4 mb-4"
+                onclick="cancelation_modal.showModal()"
+              >
+                Tue 1:30 PM - Tue 2:30 PM
+              </button>
+              <!-- Open the modal using ID.showModal() method -->
+              <dialog id="cancelation_modal" class="modal">
+                <div class="modal-box">
+                  <h3 class="font-bold text-lg">Cancel!</h3>
+                  <p class="py-4">
+                    Are you sure you want to cancel this booking? Press ESC key
+                    or click the button below to close
+                  </p>
+                  <div class="modal-action">
+                    <form action="/book_slot/{{slotId}}" method="POST">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn btn-warning">Confirm</button>
+                      <button class="btn">Close</button>
+                    </form>
+                  </div>
+                </div>
+              </dialog>
+              <hr class="p-2 mt-4" />
+            </div>
+            <div>
+              <p class="font-semibold mb-2">Free</p>
+              <button
+                class="btn btn-primary mr-4 mb-4 text-white"
+                onclick="deletion_modal.showModal()"
+              >
+                Tue 1:30 PM - Tue 2:30 PM
+              </button>
+              <!-- Open the modal using ID.showModal() method -->
+              <dialog id="deletion_modal" class="modal">
+                <div class="modal-box">
+                  <h3 class="font-bold text-lg">Delete!</h3>
+                  <p class="py-4">
+                    Do you confirm deleting this time slot? Press ESC key or
+                    click the button below to close
+                  </p>
+                  <div class="modal-action">
+                    <form action="/book_slot/{{slotId}}" method="POST">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn btn-error">Confirm</button>
+                      <button class="btn">Close</button>
+                    </form>
+                  </div>
+                </div>
+              </dialog>
+              <hr class="p-2 mt-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white shadow-md rounded p-8 mx-12 mt-12 w-screen flex">
+        <div class="h-24 w-24">
+          <div class="avatar">
+            <div class="w-24 rounded-full">
+              <img
+                src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+              />
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-------------------------------------------------------------------------------------------------->
+
+
+
+
+        <div class="mx-12">
+          <div>
+            <p class="font-semibold">Create new tie slot</p>
+            <hr class="p-2 mt-4" />
+          </div>
+          <div>
+
+			<div>
+				<!-- Your HTML content here -->
+				<input class="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" type="text" id="datetimepicker" placeholder="Select Date and Time">
+				<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+				<script>
+					flatpickr("#datetimepicker", {
+						enableTime: true,
+						dateFormat: "Y-m-d H:i",
+					});
+				</script>
+			</div>
+            <p class="font-semibold my-6">My bookings</p>
+            <div>
+              <p class="font-semibold mb-2">Pending for validation</p>
+              <button
+                class="btn btn-secondary mr-4 mb-4"
+                onclick="validation_modal.showModal()"
+              >
+                Tue 1:30 PM - Tue 2:30 PM
+              </button>
+              <!-- Open the modal using ID.showModal() method -->
+              <dialog id="validation_modal" class="modal">
+                <div class="modal-box">
+                  <h3 class="font-bold text-lg">Validate!</h3>
+                  <p class="py-4">
+                    Do you confirm validation for this time slot? Press ESC key
+                    or click the button below to close
+                  </p>
+                  <div class="modal-action">
+                    <form action="/book_slot/{{slotId}}" method="POST">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn btn-success">Confirm</button>
+                      <button class="btn">Close</button>
+                    </form>
+                  </div>
+                </div>
+              </dialog>
+              <hr class="p-2 mt-4" />
+            </div>
+            <div>
+              <p class="font-semibold mb-2">Verified</p>
+              <button
+                class="btn btn-accent mr-4 mb-4"
+                onclick="cancelation_modal.showModal()"
+              >
+                Tue 1:30 PM - Tue 2:30 PM
+              </button>
+              <!-- Open the modal using ID.showModal() method -->
+              <dialog id="cancelation_modal" class="modal">
+                <div class="modal-box">
+                  <h3 class="font-bold text-lg">Cancel!</h3>
+                  <p class="py-4">
+                    Are you sure you want to cancel this booking? Press ESC key
+                    or click the button below to close
+                  </p>
+                  <div class="modal-action">
+                    <form action="/book_slot/{{slotId}}" method="POST">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn btn-warning">Confirm</button>
+                      <button class="btn">Close</button>
+                    </form>
+                  </div>
+                </div>
+              </dialog>
+              <hr class="p-2 mt-4" />
+            </div>
+            <div>
+              <p class="font-semibold mb-2">Free</p>
+              <button
+                class="btn btn-primary mr-4 mb-4 text-white"
+                onclick="deletion_modal.showModal()"
+              >
+                Tue 1:30 PM - Tue 2:30 PM
+              </button>
+              <!-- Open the modal using ID.showModal() method -->
+              <dialog id="deletion_modal" class="modal">
+                <div class="modal-box">
+                  <h3 class="font-bold text-lg">Delete!</h3>
+                  <p class="py-4">
+                    Do you confirm deleting this time slot? Press ESC key or
+                    click the button below to close
+                  </p>
+                  <div class="modal-action">
+                    <form action="/book_slot/{{slotId}}" method="POST">
+                      <!-- if there is a button in form, it will close the modal -->
+                      <button class="btn btn-error">Confirm</button>
+                      <button class="btn">Close</button>
+                    </form>
+                  </div>
+                </div>
+              </dialog>
+              <hr class="p-2 mt-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{> footer}}
+  </body>
+</html>

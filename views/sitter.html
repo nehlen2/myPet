@@ -3,85 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Animal Sitter Page</title>
     <link
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.10.1/dist/full.min.css"
       rel="stylesheet"
+      type="text/css"
     />
-    <style>
-      .sitter-img {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-right: 20px;
-      }
-      .time-slot-button {
-        margin-right: 5px;
-        margin-bottom: 5px;
-      }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{{sitter.name}}</title>
   </head>
   <body>
-  {{> navbar}}
-    
-    <div class="container">
-      <div class="row mt-5">
-        <div class="col-md-6">
-          <img
-            src="https://blooming-pets.com/wp-content/uploads/2024/01/recherche-catsitter.png"
-            alt="Cat Sitter"
-            class="sitter-img"
-          />
-          <h2>John Doe</h2>
-          <p>1234 Elm Street, Anytown, USA</p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget
-            purus vitae odio aliquet sagittis.
-          </p>
-          <h4>Available Time Slots:</h4>
-          <div class="btn-group-vertical">
-            <a href="/booking-form">
-              <button
-                type="button"
-                class="btn btn-primary btn-sm time-slot-button"
-                href="/booking-form"
-              >
-                8:00 AM - 10:00 AM
-              </button></a
-            >
-            <a href="/booking-form">
-				<button
-				  type="button"
-				  class="btn btn-primary btn-sm time-slot-button"
-				  href="/booking-form"
-				>
-				  8:00 AM - 10:00 AM
-				</button></a
-			  >
-			  <a href="/booking-form">
-				<button
-				  type="button"
-				  class="btn btn-primary btn-sm time-slot-button"
-				  href="/booking-form"
-				>
-				  8:00 AM - 10:00 AM
-				</button></a
-			  >
-			  <a href="/booking-form">
-				<button
-				  type="button"
-				  class="btn btn-primary btn-sm time-slot-button"
-				  href="/booking-form"
-				>
-				  8:00 AM - 10:00 AM
-				</button></a
-			  >
-            <!-- Add more time slots here -->
+    {{> navbar}}
+    <div class="flex items-start justify-start h-screen w-screen">
+      <div class="bg-white shadow-md rounded p-8 m-12 w-screen flex">
+        <div class="h-24 w-24">
+          <div class="avatar">
+            <div class="w-24 rounded-full">
+              <img
+                src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+              />
+            </div>
           </div>
+        </div>
+        <div class="mx-12">
+          <p class="font-semibold">{{sitter.name}}</p>
+          <p>{{sitter.postalCode}}, {{sitter.city}}</p>
+          <hr class="p-2 mt-4" />
+          {{#sitter.slots}}
+          <button
+            class="btn btn-primary mr-4 mb-4"
+            onclick="confirmation_modal.showModal()"
+          >
+            {{beg}} - {{end}}
+          </button>
+
+          <!-- Open the modal using ID.showModal() method -->
+          <dialog id="confirmation_modal" class="modal">
+            <div class="modal-box">
+              <h3 class="font-bold text-lg">Confirm!</h3>
+              <p class="py-4">
+                Do you confirm booking this time slot? Press ESC key or click
+                the button below to close
+              </p>
+              <div class="modal-action">
+                <form action="/book_slot/{{slotId}}" method="POST">
+                  <!-- if there is a button in form, it will close the modal -->
+                  <button class="btn btn-primary">Confirm</button>
+                  <button class="btn">Close</button>
+                </form>
+              </div>
+            </div>
+          </dialog>
+
+          {{/sitter.slots}}
         </div>
       </div>
     </div>
-  {{> footer}}  
+    {{> footer}}
   </body>
 </html>
