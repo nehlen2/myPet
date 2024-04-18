@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const service = require("./service/service.js");
 const cookieParser = require("cookie-parser");
 const validate = require("./middleware/validate.js");
+const { error } = require("console");
 
 
 // configure mustache as template engine
@@ -41,7 +42,11 @@ app.get("/", async (req, res) => {
   // check authenticated user
   let cookie = req.cookies.user;
   if( cookie !== undefined) {
-    res.render("index", {user : cookie, message: req.query.message})
+    if (cookie.role === 'sitter') {
+      res.redirect("sitter-admin")
+    } else {
+      res.render("index", {user : cookie, message: req.query.message})
+    }
   } else {
     res.render("index");
   }
@@ -60,23 +65,23 @@ app.get("/contact", (req, res) => {
   }
 });
 
-app.get("/sitters/:animal", async (req, res) => {
+app.get("/sitters/:activity", async (req, res) => {
   let cookie = req.cookies.user;
   if( cookie !== undefined ) {
     let sitters = await service.getAllSitters();
     sitters = await service.filterByCity(sitters, cookie.city);
     if (sitters.length !== 0) {
       sitters = await service.appendWithNextAvailableSlot(sitters);
-      res.render("sitters", {user : cookie, animal : req.params.animal, sitters : sitters});
+      res.render("sitters", {user : cookie, activity : req.params.activity, sitters : sitters});
     } else {
       sitters = await service.getAllSitters();
       sitters = await service.appendWithNextAvailableSlot(sitters);
-      res.render("sitters", {user : cookie, sitters : sitters, animal : req.params.animal, message: "No sitters found in your area. Showing all sitters instead."})
+      res.render("sitters", {user : cookie, sitters : sitters, activity : req.params.activity, message: "No sitters found in your area. Showing all sitters instead."})
     }
   } else {
     let sitters = await service.getAllSitters();
     sitters = await service.appendWithNextAvailableSlot(sitters);
-    res.render("sitters", {animal : req.params.animal, sitters : sitters, message : "Please login to search for sitter in your city"});
+    res.render("sitters", {activity : req.params.activity, sitters : sitters, message : "Please login to search for sitter in your city"});
   }
 });
 
@@ -105,10 +110,9 @@ app.post("/login", async (req, res) => {
     };
     const token = service.generateAccessJWT(user); // generate jwt token for user
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
-    authenticated = "true";
     res.cookie('user' ,user, { maxAge:  20 * 60 * 1000, httpOnly: true });
     if(user.role === "sitter") {
-      res.redirect("/sitter-admin")
+      res.redirect("/sitter-admin");
     } else {
       res.redirect("/")
     }
@@ -118,10 +122,25 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/sitter-admin", validate.Verify, async (req, res) => {
-  let cookie = req.cookies.user;
-  if( cookie !== undefined && cookie.role === "sitter") {
-    res.render("sitter-admin", {user : cookie})
-  } else {
+try {
+    let cookie = req.cookies.user;
+    if (cookie.role !== 'sitter') {
+      throw new Error("You are not a sitter");
+    } 
+    let slots = await service.getSlotsBySitter(cookie.userId)
+
+    let availableSlots = await service.filterFree(slots);
+    availableSlots = await service.formatTime(availableSlots);
+
+    let pendingSlots = await service.filterPending(slots);
+    pendingSlots = await service.formatTime(pendingSlots);
+
+    let confirmedSlots = await service.filterBooked(slots);
+    confirmedSlots = await service.formatTime(confirmedSlots);
+
+    res.render("sitter-admin", {user : cookie, pendingSlots : pendingSlots, confirmedSlots : confirmedSlots , availableSlots: availableSlots})
+  } catch (error) {
+    console.error(error);
     res.render("login");
   }
 });
@@ -135,7 +154,11 @@ app.post("/register", async (req, res) => {
       req.body.password,
       req.body.city,
       req.body.postalCode,
-      req.body.sitter ? "sitter" : "owner"
+      //req.body.cat_sitter || req.body.dog_sitter || req.body.pet_walker ? "sitter" : "owner",
+      req.body.cat_sitter,
+      req.body.dog_sitter,
+      req.body.pet_walker,
+      req.body.picture
     );
     let options = {
       maxAge: 20 * 60 * 1000, // would expire in 20minutes
@@ -146,7 +169,6 @@ app.post("/register", async (req, res) => {
 
     const token = service.generateAccessJWT(user); // generate jwt token for user
     res.cookie("Authorization", token, options); // set the token to response header, so that the client sends it back on each subsequent request
-    authenticated = "true";
     res.cookie('user', user, { maxAge: 900000, httpOnly: true });
     if(user.role === "sitter") {
       res.redirect("/sitter-admin")
@@ -158,18 +180,21 @@ app.post("/register", async (req, res) => {
   }
 });
 
+const validateCreateSlotReqBody = (req) => {
+  let check = req.body.begDateime !== '' && req.body.endDateime !== '' ;
+  return check;
+}
+
 app.post("/create_slot" , validate.Verify, async (req, res) => {
   try {
-    let booked_slot = await service.createSlot(req.body.sitter, req.body.begDateime, req.body.endDateTime);
-    res.status(200).json({
-      status: "success",
-      data: booked_slot.dataValues,
-    });
+    let cookie = req.cookies.user;
+    if (validateCreateSlotReqBody(req) === false) {
+      throw new Error("Invalid req body");
+    }
+    let booked_slot = await service.createSlot(req.user.userId, req.body.begDateime, req.body.endDateTime);
+    res.redirect("/sitter-admin")
   } catch (err) {
-    res.status(500).json({
-      status: "failed",
-      message: "could not create slot",
-    });
+    res.render("sitter-admin", {alert: "There was an error when creating your slot" , createAlert : "true", user : req.cookies.user})
   }
 })
 
@@ -182,24 +207,81 @@ app.post("/book_slot/:slotId" , validate.Verify, async (req, res) => {
   }
 })
 
-app.put("/accept_booking" , validate.Verify, async (req, res) => {
+app.post("/accept_booking" , validate.Verify, async (req, res) => {
   try {
     let booked_slot = await service.acceptBooking(req.body.slotId);
-    res.status(200).json({
-      status: "success",
-      data: booked_slot,
-    });
+    res.redirect("/sitter-admin");
   } catch (err) {
-    res.status(500).json({
-      status: "failed",
-      message: "could not accept slot",
-    });
+    res.redirect("/sitter-admin");
+  }
+})
+
+app.post("/confirmation/accept_booking/accept_booking/:id" , validate.Verify, async (req, res) => {
+  try {
+    let booked_slot = await service.acceptBooking(req.params.id);
+    res.redirect("/sitter-admin");
+  } catch (err) {
+    res.redirect("/sitter-admin")
+  }
+})
+
+app.post("/confirmation/cancel_booking/cancel_booking/:id" , validate.Verify, async (req, res) => {
+  try {
+    let booked_slot = await service.cancelBooking(req.params.id);
+    res.redirect("/sitter-admin");
+  } catch (err) {
+    res.redirect("/sitter-admin")
+  }
+})
+
+app.post("/confirmation/delete_slot/delete_slot/:id" , validate.Verify, async (req, res) => {
+  try {
+    let deletedSlot = await service.deleteSlot(req.params.id);
+    res.redirect("/sitter-admin");
+  } catch (err) {
+    res.redirect("/sitter-admin")
+  }
+})
+
+
+app.post("/confirmation/book_slot/book_slot/:id" , validate.Verify, async (req, res) => {
+  try {
+    let user = req.cookies.user;
+    let deletedSlot = await service.bookSlot(user.userId ,req.params.id);
+    res.redirect("/");
+  } catch (err) {
+    res.redirect("/")
+  }
+})
+
+app.post("/confirmation/:method/:id", async (req, res) => {
+  try {
+    let method = req.params.method;
+    let id = req.params.id;
+    if (method === 'accept_booking') {
+      res.render("confirmation", {method: method, verb : "Confirm", message : "Would you like to confirm this booking request?", btn : "Accept", btnColor : "success", id : id})
+      }
+
+    if (method === 'cancel_booking') {
+      res.render("confirmation", {method: method, verb : "Cancel", message : "Would you like to cancel this booking?", btn : "Cancel", btnColor : "error", id : id})
+    }
+
+    if (method === 'delete_slot') {
+      res.render("confirmation", {method: method, verb : "Delete", message : "Would you like to delete this booking?", btn : "Delete", btnColor : "warning", id : id})
+    }
+
+    if (method === 'book_slot') {
+      res.render("confirmation", {method: method, verb : "Confirm", message : "Would you like to book this slot?", btn : "Confirm", btnColor : "success", id : id})
+    }
+  } catch (error) {
+    console.error(error);
   }
 })
 
 app.get("/get_sitter_slots" , validate.Verify, async (req, res) => {
   try {
-    let slots = await service.getSlotsBySitter(req.body.sitterId)
+    let cookie = req.cookies.user;
+    let slots = await service.getSlotsBySitter(cookie.userId)
     res.status(200).json({
       status: "success",
       data: slots,

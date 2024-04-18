@@ -14,17 +14,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
+
   <body class="bg-gradient-to-r from-purple-500 to-pink-500">
     {{> navbar}} 
     {{^message}}
     <p class="text-2xl text-wrap pt-24 pl-24 text-slate-100">Our {{animal}} sitters around you:</p>
 
         <!-- Search input for filtering by city -->
-        <div class="flex justify-start mb-6 mt-12">
+    <div class="flex justify-start mb-6 mt-12">
           <input id="citySearch" type="text" class="input max-w-xs ml-20" placeholder="Search by city">
-          <input id="postalCodeSearch" type="text" class="input max-w-xs ml-12" placeholder="Search by postal code">
-        </div>
-
+          <input id="postalCodeSearch" type="text" class="input max-w-xs ml-12" placeholder="Search by postal code"> 
+    </div>
+    
     <div class="flex flex-start flex-wrap m-12 my-12">
       {{/message}}
       {{#message}}
@@ -39,8 +40,8 @@
     <div class="flex flex-start flex-wrap m-12 my-12">
       {{/message}}
       {{#sitters}}
-    <div class="card card-side bg-base-100 shadow-xl m-6">
-      <figure><img src="https://daisyui.com/images/stock/photo-1635805737707-575885ab0820.jpg" alt="Sitter"/></figure>
+    <div class="card card-side bg-base-100 shadow-xl m-4">
+      <figure class="max-w-40"><img src="{{picture}}" alt="Sitter"/></figure>
       <div class="card-body">
         <a href="sitter/{{userId}}"><h2 class="card-title">{{name}}</h2></a>
         <p>{{postalCode}}, {{city}}</p>
@@ -50,23 +51,9 @@
               <p class="text-lg" >No available slots</p>
           {{/slots}}
           {{#slots}}
-          <button class="btn btn-primary" onclick="confirmation_modal.showModal()">{{beg}} - {{end}}</button>
-
-          <!-- Open the modal using ID.showModal() method -->
-          <dialog id="confirmation_modal" class="modal">
-            <div class="modal-box">
-              <h3 class="font-bold text-lg">Confirm!</h3>
-              <p class="py-4">Do you confirm booking this time slot? Press ESC key or click the button below to close</p>
-              <div class="modal-action">
-                <form action="/book_slot/{{slotId}}" method="POST">
-                  <!-- if there is a button in form, it will close the modal -->
-                  <button class="btn btn-primary">Confirm</button>
-                  <button class="btn">Close</button>
-                </form>
-              </div>
-            </div>
-          </dialog>
-
+          <form action="/confirmation/book_slot/{{slotId}}" method="POST">
+          <button class="btn btn-primary" type="submit">{{beg}} - {{end}}</button>
+          </form>
           {{/slots}}
         </div>
       </div>
@@ -76,23 +63,6 @@
     </div>
     {{> footer}}
 
-        <!-- JavaScript to filter sitters by city -->
-        <script>
-          $(document).ready(function() {
-            $('#citySearch').on('input', function() {
-              const searchValue = $(this).val().toLowerCase();
-              $('.card').each(function() {
-                const sitterCity = $(this).find('p').text().split(',')[1].trim().toLowerCase();
-                if (sitterCity.includes(searchValue)) {
-                  $(this).show();
-                } else {
-                  $(this).hide();
-                }
-              });
-            });
-          });
-        </script>
-
         <!-- JavaScript to filter sitters by postal code -->
         <script>
           $(document).ready(function() {
@@ -101,6 +71,20 @@
               $('.card').each(function() {
                 const sitterPostalCode = $(this).find('p').text().split(',')[0].trim().toLowerCase();
                 if (sitterPostalCode.includes(searchValue)) {
+                  $(this).show();
+                } else {
+                  $(this).hide();
+                }
+              });
+            });
+          });
+
+          $(document).ready(function() {
+            $('#citySearch').on('input', function() {
+              const searchValue = $(this).val().toLowerCase();
+              $('.card').each(function() {
+                const sitterCity = $(this).find('p').text().split(',')[1].trim().toLowerCase();
+                if (sitterCity.includes(searchValue)) {
                   $(this).show();
                 } else {
                   $(this).hide();

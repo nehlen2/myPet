@@ -16,7 +16,7 @@ const sequelize = new Sequelize(
   }
 );
 
-sequelize.sync();
+
 
 const User = sequelize.define("user", {
   userId: {
@@ -45,8 +45,24 @@ const User = sequelize.define("user", {
     allowNull: false,
   },
   role: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
+  },
+  cat: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  dog: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  walk: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  }
+  ,picture: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 });
 
@@ -78,6 +94,8 @@ const Slot = sequelize.define("slot", {
   },
 });
 
+sequelize.sync();
+
 User.hasMany(Slot, {
   foreignKey: 'sitter',
 });
@@ -95,20 +113,33 @@ User.beforeCreate(async (user, options) => {
 exports.findUserByEmail = async function (email) {
   let user = await User.findOne({
     where: { email: email },
-	attributes: ["userId","name", "email", "city", "postalCode", "role","password"]
+	attributes: ["userId","name", "email", "city", "postalCode", "role", "password", "cat", "dog", "walk", "picture"]
   });
   return user;
 };
 
-exports.createUser = async function (name, email, password, city, postalCode, role) {
+exports.createUser = async function (name,
+  email,
+  password,
+  city,
+  postalCode,
+  role,
+  cat_sitter, 
+  dog_sitter,
+  pet_walker,
+  picture) {
 
     return await User.create({
-      name: name,
-      email: email,
-      password: password,
-      city: city,
-      postalCode: postalCode,
-      role: role
+      name,
+      email,
+      password,
+      city,
+      postalCode,
+      role,
+      cat_sitter, 
+      dog_sitter,
+      pet_walker,
+      picture
     });
  
 };
@@ -150,6 +181,31 @@ exports.acceptBookig = async function (slotId) {
       { 
         status: "booked"
       }, 
+      {
+        where: {slotId : slotId}
+      });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+exports.cancelBookig = async function (slotId) {
+  try {
+    return await Slot.update(
+      { 
+        status: "free"
+      }, 
+      {
+        where: {slotId : slotId}
+      });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+exports.deleteSlot = async function (slotId) {
+  try {
+    return await Slot.destroy(
       {
         where: {slotId : slotId}
       });

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{verb}}</title>
+</head>
+<body class="bg-gradient-to-r from-purple-500 to-pink-500">
+    {{> navbar}}
+    <div class="flex items-start justify-center h-screen w-screen">
+      <div class="p-8 mx-12 mt-12 w-screen flex">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg">{{verb}}!</h3>
+			<p class="py-4">
+			  {{message}}
+			<div class="modal-action">
+			  <form action="{{method}}/{{id}}" method="POST">
+				<!-- if there is a button in form, it will close the modal -->
+				<button class="btn btn-{{btnColor}}">{{btn}}</button>
+			  </form>
+			</div>
+		  </div>
+	  </div>
+	</div>
+	{{> footer}}
+</body>
+</html>
